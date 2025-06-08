@@ -2,8 +2,8 @@
 -- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
--- Host: 127.0.0.1
--- Generation Time: Jun 08, 2025 at 12:05 PM
+-- Host: 127.0.0.1:3307
+-- Generation Time: Jun 08, 2025 at 01:04 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -30,7 +30,9 @@ SET time_zone = "+00:00";
 CREATE TABLE `approval` (
   `ApprovalID` int(11) NOT NULL,
   `ClaimID` int(11) NOT NULL,
-  `advisorID` int(11) NOT NULL
+  `advisorID` int(11) NOT NULL,
+  `approval_date` date NOT NULL,
+  `approval_status` varchar(25) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -58,12 +60,17 @@ CREATE TABLE `coordinator` (
   `staffID` varchar(50) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+-- --------------------------------------------------------
+
 --
--- Dumping data for table `coordinator`
+-- Table structure for table `draft`
 --
 
-INSERT INTO `coordinator` (`coordinatorID`, `loginID`, `coordinator_name`, `coordinator_email`, `staffID`) VALUES
-(1, 13, 'Alia', 'aliasalam@gmail.com', 'staff45');
+CREATE TABLE `draft` (
+  `eventname` varchar(100) NOT NULL,
+  `eventlevel` varchar(25) NOT NULL,
+  `role` varchar(25) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -88,13 +95,6 @@ CREATE TABLE `eventadvisor` (
   `advisor_email` varchar(100) NOT NULL,
   `staffID` varchar(50) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `eventadvisor`
---
-
-INSERT INTO `eventadvisor` (`advisorID`, `loginID`, `advisor_name`, `advisor_email`, `staffID`) VALUES
-(1, 7, 'Krish', 'krish3777@gmail.com', 'staff12');
 
 -- --------------------------------------------------------
 
@@ -125,6 +125,10 @@ CREATE TABLE `login` (
 --
 
 INSERT INTO `login` (`loginID`, `Username`, `password`, `role`) VALUES
+(1, 'student01', 's123', 'Student'),
+(2, 'advisor01', 'ad123', 'EventAdvisor'),
+(3, 'coordinator01', 'c123', 'Coordinator'),
+(4, 'student02', 's02', 'Student'),
 (5, 'student12', '$2y$10$1F3Fn9rS2Xde61vZJ4GLNeDgIlHneMVbh0H4/PomJGoBvAtVz3vYi', 'Student'),
 (7, 'ad1243', '$2y$10$ITgFsC2.xvk.5SdaVOB.SuQrUPDSjPbndmd4.lNuMd3u23bJU9ADa', 'EventAdvisor'),
 (13, 'c12', '$2y$10$4CCfPIYuyuMXHwhsX4pDSe65q1omoA8xGBLoiiFdQdDpmGPdysCoi', 'Coordinator'),
@@ -138,21 +142,21 @@ INSERT INTO `login` (`loginID`, `Username`, `password`, `role`) VALUES
 
 CREATE TABLE `membership` (
   `membershipID` int(11) NOT NULL,
-  `loginID` int(11) NOT NULL,
-  `matric_id_pic` varchar(255) NOT NULL,
-  `status` enum('Pending','Approved','Rejected') DEFAULT 'Pending',
+  `studentID` int(11) NOT NULL,
+  `matric_id_pic` varchar(250) NOT NULL COMMENT 'File path or filename of the uploaded image',
+  `status` enum('Pending','Approved','Rejected','') NOT NULL,
   `application_date` date NOT NULL,
-  `approval_date` date DEFAULT NULL,
-  `studentID` int(11) NOT NULL
+  `approval_date` date NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `membership`
 --
 
-INSERT INTO `membership` (`membershipID`, `loginID`, `matric_id_pic`, `status`, `application_date`, `approval_date`, `studentID`) VALUES
-(2, 5, 'uploads/68448f1cd7a7c_Screenshot 2024-06-17 231555.png', 'Approved', '2025-06-08', '2025-06-08', 3),
-(3, 14, 'uploads/68452a6970601_Screenshot 2024-10-31 104400.png', 'Rejected', '2025-06-08', '2025-06-08', 4);
+INSERT INTO `membership` (`membershipID`, `studentID`, `matric_id_pic`, `status`, `application_date`, `approval_date`) VALUES
+(1, 1, 'uploads/6830d5dc036c3_Screenshot 2024-06-17 231555.png', 'Pending', '2025-05-23', '0000-00-00'),
+(2, 1, 'uploads/68316357cf417_Screenshot 2024-06-22 020543.png', 'Pending', '2025-05-24', '0000-00-00'),
+(3, 2, 'uploads/68316457b11d8_Screenshot 2024-06-18 161607.png', 'Pending', '2025-05-24', '0000-00-00');
 
 -- --------------------------------------------------------
 
@@ -162,7 +166,11 @@ INSERT INTO `membership` (`membershipID`, `loginID`, `matric_id_pic`, `status`, 
 
 CREATE TABLE `meritclaim` (
   `ClaimID` int(11) NOT NULL,
-  `StudentID` int(11) NOT NULL
+  `StudentID` int(11) NOT NULL,
+  `EventLevel` varchar(25) NOT NULL,
+  `Role` varchar(25) NOT NULL,
+  `MeritPoint` int(11) NOT NULL,
+  `EventName` varchar(100) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -196,6 +204,8 @@ CREATE TABLE `student` (
 --
 
 INSERT INTO `student` (`studentID`, `loginID`, `student_name`, `student_number`, `student_email`) VALUES
+(1, 1, 'Saathish', 'cb23019', 'saathish3777@gmail.com'),
+(2, 4, 'shakti', 'ca23019', 'shakti3777@gmail.com'),
 (3, 5, 'Manoj', 'cb23019', 'manoj21@gmail.com'),
 (4, 14, 'Shaktivel A/L Hari Rama', 'CA23017', 'shakti213@gmail.com');
 
@@ -255,9 +265,7 @@ ALTER TABLE `login`
 -- Indexes for table `membership`
 --
 ALTER TABLE `membership`
-  ADD PRIMARY KEY (`membershipID`),
-  ADD KEY `loginID` (`loginID`),
-  ADD KEY `studentID` (`studentID`);
+  ADD PRIMARY KEY (`membershipID`);
 
 --
 -- Indexes for table `meritclaim`
